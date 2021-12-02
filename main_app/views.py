@@ -6,9 +6,55 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 import random
+import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
 
 from .models import *
 from .serializers import *
+
+
+class UpdateCamerasView(APIView):
+    """
+    Update and get cameras data
+    """
+
+    @staticmethod
+    def get(request):
+        session = boto3.session.Session()
+
+        s3 = session.client(
+            service_name='s3',
+            endpoint_url='https://storage.yandexcloud.net',
+            config=Config(signature_version=UNSIGNED)
+        )
+
+        cameras = Camera.objects.all()
+        for camera in cameras:
+            images = []
+            for key in s3.list_objects(Bucket='reality-x', Prefix=f'trash/{camera.uid}')['Contents']:
+                if not key['Key'].lower().endswith('/'):
+                    images.append(f'https://s3.yandexcloud.net/reality-x/{key["Key"]}')
+            while True:
+                new_last_img_name = images[random.randrange(len(images))]
+                if not camera.last_img == new_last_img_name:
+                    camera.last_img = new_last_img_name
+                    break
+            camera.is_filled = random.randrange(2)
+            camera.save()
+
+        update_time = UpdatedTime.objects.all().first()
+        update_time.set_new_time()
+
+        cameras = Camera.objects.all()
+        cameras = AllCamerasSerializer(cameras, context={'request': request}, many=True).data
+        return Response({
+            'status': status.HTTP_200_OK,
+            'data': {
+                'timestamp': UpdatedTime.objects.all().first().value,
+                'cameras': cameras
+            }
+        })
 
 
 class GetAllCamerasView(APIView):
@@ -36,7 +82,6 @@ class GetCameraView(APIView):
 
     @staticmethod
     def get(request, camera_uid):
-
         camera = Camera.objects.get(uid=camera_uid)
         camera = CurrentCamerasSerializer(camera, context={'request': request}).data
         camera['timestamp'] = UpdatedTime.objects.all().first().value
@@ -44,24 +89,6 @@ class GetCameraView(APIView):
             'status': status.HTTP_200_OK,
             'data': {
                 'camera': camera
-            }
-        })
-
-
-class UpdateCamerasView(APIView):
-    """
-    Update and get cameras data
-    """
-
-    @staticmethod
-    def get(request):
-        cameras = Camera.objects.all()
-        cameras = AllCamerasSerializer(cameras, context={'request': request}, many=True).data
-        return Response({
-            'status': status.HTTP_200_OK,
-            'data': {
-                'timestamp': UpdatedTime.objects.all().first().value,
-                'cameras': cameras
             }
         })
 
@@ -145,6 +172,34 @@ class FillDatabaseView(APIView):
                 )
                 camera.save()
                 camera.get_coordinates()
+
+        except Exception as e:
+            list_of_errors.append(f"UpdatedTime adding: {str(e)}")
+
+        try:
+            session = boto3.session.Session()
+
+            s3 = session.client(
+                service_name='s3',
+                endpoint_url='https://storage.yandexcloud.net',
+                config=Config(signature_version=UNSIGNED)
+            )
+            cameras = Camera.objects.all()
+            for camera in cameras:
+                images = []
+                for key in s3.list_objects(Bucket='reality-x', Prefix=f'trash/{camera.uid}')['Contents']:
+                    if not key['Key'].lower().endswith('/'):
+                        images.append(f'https://s3.yandexcloud.net/reality-x/{key["Key"]}')
+                while True:
+                    new_last_img_name = images[random.randrange(len(images))]
+                    if not camera.last_img == new_last_img_name:
+                        camera.last_img = new_last_img_name
+                        break
+                camera.is_filled = random.randrange(2)
+                camera.save()
+
+            update_time = UpdatedTime.objects.all().first()
+            update_time.set_new_time()
 
         except Exception as e:
             list_of_errors.append(f"UpdatedTime adding: {str(e)}")

@@ -5,7 +5,7 @@ from .models import *
 
 
 class CameraAdmin(admin.ModelAdmin):
-    list_display = ('address', 'uid', 'x_coordinate', 'y_coordinate', 'error_status', 'is_filled', 'id')
+    list_display = ('address', 'uid', 'x_coordinate', 'y_coordinate', 'error_status', 'is_filled', 'id', 'last_img')
 
 
 admin.site.register(UpdatedTime)
