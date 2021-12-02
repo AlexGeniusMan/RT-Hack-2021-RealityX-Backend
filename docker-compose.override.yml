@@ -1,0 +1,66 @@
+version: '3.7'
+
+services:
+  backend:
+    build:
+      context: .
+    volumes:
+      - ./media/:/usr/src/project/media/
+    environment:
+      BACKEND_DEBUG_MODE: ${BACKEND_DEBUG_MODE}
+      BACKEND_SECRET_KEY: ${BACKEND_SECRET_KEY}
+      BACKEND_ALLOWED_HOSTS: ${BACKEND_ALLOWED_HOSTS}
+      DJANGO_SUPERUSER_USERNAME: ${BACKEND_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_EMAIL: ${BACKEND_SUPERUSER_EMAIL}
+      DJANGO_SUPERUSER_PASSWORD: ${BACKEND_SUPERUSER_PASSWORD}
+      BACKEND_DEFAULT_DB: ${BACKEND_DEFAULT_DB}
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      BACKEND_IMAGE_MAX_SIZE: ${BACKEND_IMAGE_MAX_SIZE}
+      BACKEND_AUDIO_MAX_SIZE: ${BACKEND_AUDIO_MAX_SIZE}
+
+      BACKEND_DEFAULT_STORAGE: ${BACKEND_DEFAULT_STORAGE}
+      BACKEND_AWS_S3_ENDPOINT_URL: ${BACKEND_AWS_S3_ENDPOINT_URL}
+      BACKEND_AWS_ACCESS_KEY_ID: ${BACKEND_AWS_ACCESS_KEY_ID}
+      BACKEND_AWS_SECRET_ACCESS_KEY: ${BACKEND_AWS_SECRET_ACCESS_KEY}
+      BACKEND_AWS_STORAGE_BUCKET_NAME: ${BACKEND_AWS_STORAGE_BUCKET_NAME}
+      BACKEND_AWS_S3_REGION_NAME: ${BACKEND_AWS_S3_REGION_NAME}
+
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+  db:
+    image: postgres:12-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+  s3:
+    image: zenko/cloudserver
+    environment:
+      ENDPOINT: '127.0.0.1.nip.io'
+      REMOTE_MANAGEMENT_DISABLE: '1'
+      S3BACKEND: 'file'
+    ports:
+    - 8000:8000
+    networks:
+      default:
+        aliases:
+          - 127.0.0.1.nip.io
+    volumes:
+    - s3_data:/usr/src/app/localData
+    - s3_metadata:/usr/src/app/localMetadata
+volumes:
+  postgres_data:
+  s3_data:
+  s3_metadata:

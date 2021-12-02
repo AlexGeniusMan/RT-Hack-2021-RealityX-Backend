@@ -1,0 +1,12 @@
+.git
+.idea
+desktop.ini
+venv
+.venv
+.env
+static_django
+media
+db.sqlite3
+META
+dev-data
+__pycache__
