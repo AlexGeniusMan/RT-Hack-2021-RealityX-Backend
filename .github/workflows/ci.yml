@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ci
+jobs:
+  Update service:
+    runs-on: ubuntu-latest
+    steps:
+    - name: multiple command
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: |
+          git clone -b ci /home/user/hack/root-dev/backend
+          cd /home/user/hack/root-dev
+          docker-compose -f docker-compose.production.yml build backend
+          docker service update --image rt_backend:latest dev-rt_backend --force
