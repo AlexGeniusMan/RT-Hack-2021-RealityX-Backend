@@ -369,14 +369,28 @@ class FillDatabaseView(APIView):
                 camera_events = CameraEvent.objects.all()
                 camera_events.delete()
 
-            cameras = Camera.objects.all()
-            for camera in cameras:
-                for i in range(24):
-                    containers_number = random.randrange(1, 10)
-                    filled_containers_number = random.randrange(0, containers_number)
+            for i in range(3):
+                print(f'Iteration #{i + 1} started')
+                cameras = Camera.objects.all()
+
+                data = {
+                    "img_size": 1080,
+                    "conf": 0.483,
+                    "urls": [
+                        camera.last_img for camera in cameras
+                    ]
+                }
+
+                response = requests.post('https://577b-193-41-142-48.ngrok.io/predict/trash/', timeout=10000,
+                                         json=data).json()
+                for el in response:
+                    camera_uid = el['url'].split('/')[-2]
+                    camera = Camera.objects.get(uid=camera_uid)
+                    camera.last_img_pred = el['url']
+                    camera.save()
+
                     camera_event = CameraEvent(
-                        containers_number=containers_number,
-                        filled_containers_number=filled_containers_number,
+                        dog_number=el['n_all'],
                         camera=camera
                     )
                     camera_event.save()
@@ -523,6 +537,7 @@ class FillDatabaseView(APIView):
 
         except Exception as e:
             list_of_errors.append(f"DogCameras predicting: {str(e)}")
+            raise
 
         return Response({
             'status': status.HTTP_200_OK,
