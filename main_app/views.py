@@ -59,11 +59,13 @@ class UpdateDogCamerasView(APIView):
         for camera in cameras:
             probability_of_dogs = random.randrange(1, 11)
             if probability_of_dogs < 3:
+                print('True')
                 source = 'dogs_clear'
             else:
+                print('False')
                 source = 'dogs'
             images = []
-            for key in s3.list_objects(Bucket='reality-x', Prefix=f'{source}/{camera.uid}')['Contents']:
+            for key in s3.list_objects(Bucket='reality-x', Prefix=f'{source}/{camera.uid}/')['Contents']:
                 if not key['Key'].lower().endswith('/'):
                     images.append(f'https://s3.yandexcloud.net/reality-x/{key["Key"]}')
             while True:
@@ -71,6 +73,7 @@ class UpdateDogCamerasView(APIView):
                 if not camera.last_img == new_last_img_name:
                     camera.last_img = new_last_img_name
                     break
+
             # camera.is_filled = random.randrange(2)
             # containers_number = random.randrange(1, 10)
             # filled_containers_number = random.randrange(0, containers_number)
@@ -82,13 +85,37 @@ class UpdateDogCamerasView(APIView):
             # )
             # camera_event.save()
 
-            dog_number = random.randrange(0, 10)
+            # dog_number = random.randrange(0, 10)
+            # camera_event = DogCameraEvent(
+            #     dog_number=dog_number,
+            #     camera=camera
+            # )
+            # camera_event.save()
+            camera.save()
+
+        cameras = DogCamera.objects.all()
+
+        data = {
+            "img_size": 640,
+            "conf": 0.3,
+            "urls": [
+                camera.last_img for camera in cameras
+            ]
+        }
+
+        response = requests.post('https://577b-193-41-142-48.ngrok.io/predict/dogs/', timeout=10000,
+                                 json=data).json()
+        for el in response:
+            camera_uid = el['url'].split('/')[-2]
+            camera = DogCamera.objects.get(uid=camera_uid)
+            camera.last_img_pred = el['url']
+            camera.save()
+
             camera_event = DogCameraEvent(
-                dog_number=dog_number,
+                dog_number=el['n_all'],
                 camera=camera
             )
             camera_event.save()
-            camera.save()
 
         update_time = DogUpdatedTime.objects.all().first()
         update_time.set_new_time()
@@ -441,13 +468,14 @@ class FillDatabaseView(APIView):
             )
             cameras = DogCamera.objects.all()
             for camera in cameras:
+                print(camera.uid)
                 probability_of_dogs = random.randrange(1, 11)
                 if probability_of_dogs < 3:
                     source = 'dogs_clear'
                 else:
                     source = 'dogs'
                 images = []
-                for key in s3.list_objects(Bucket='reality-x', Prefix=f'{source}/{camera.uid}')['Contents']:
+                for key in s3.list_objects(Bucket='reality-x', Prefix=f'{source}/{camera.uid}/')['Contents']:
                     if not key['Key'].lower().endswith('/'):
                         images.append(f'https://s3.yandexcloud.net/reality-x/{key["Key"]}')
                 while True:
@@ -467,20 +495,34 @@ class FillDatabaseView(APIView):
             if DogCameraEvent.objects.all().exists():
                 camera_events = DogCameraEvent.objects.all()
                 camera_events.delete()
+            for i in range(3):
+                print(f'Iteration #{i + 1} started')
+                cameras = DogCamera.objects.all()
 
-            cameras = DogCamera.objects.all()
-            for camera in cameras:
-                for i in range(24):
-                    dog_number = random.randrange(0, 10)
+                data = {
+                    "img_size": 640,
+                    "conf": 0.3,
+                    "urls": [
+                        camera.last_img for camera in cameras
+                    ]
+                }
+
+                response = requests.post('https://577b-193-41-142-48.ngrok.io/predict/dogs/', timeout=10000,
+                                         json=data).json()
+                for el in response:
+                    camera_uid = el['url'].split('/')[-2]
+                    camera = DogCamera.objects.get(uid=camera_uid)
+                    camera.last_img_pred = el['url']
+                    camera.save()
 
                     camera_event = DogCameraEvent(
-                        dog_number=dog_number,
+                        dog_number=el['n_all'],
                         camera=camera
                     )
                     camera_event.save()
 
         except Exception as e:
-            list_of_errors.append(f"DogCameraEvent adding: {str(e)}")
+            list_of_errors.append(f"DogCameras predicting: {str(e)}")
 
         return Response({
             'status': status.HTTP_200_OK,

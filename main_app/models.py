@@ -110,7 +110,7 @@ class DogCameraEvent(models.Model):
         verbose_name_plural = 'Собаки - События'
 
     def __str__(self):
-        return f'Событие ({self.dog_number})'
+        return f'{self.camera.uid} Событие ({self.dog_number})'
 
 
 class DogCamera(models.Model):
@@ -121,6 +121,7 @@ class DogCamera(models.Model):
     error_status = models.BooleanField('Ошибка', default=False)
     # dog_number = models.BooleanField('Количество собак', default=False)
     last_img = models.CharField('Последний кадр', max_length=500, blank=True)
+    last_img_pred = models.CharField('Распознанный кадр', max_length=500, blank=True)
 
     class Meta:
         verbose_name = 'Собаки - Камера'

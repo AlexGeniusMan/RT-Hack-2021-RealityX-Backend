@@ -39,7 +39,7 @@ class CurrentDogCamerasSerializer(serializers.ModelSerializer):
     class Meta:
         depth = 0
         model = DogCamera
-        fields = ('uid', 'address', 'last_img')
+        fields = ('uid', 'address', 'last_img', 'last_img_pred')
 
 
 class AllDogCamerasSerializer(serializers.ModelSerializer):
