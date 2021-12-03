@@ -1,0 +1,23 @@
+name: CI-main
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  UpdateService:
+    runs-on: ubuntu-latest
+    steps:
+    - name: multiple command
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: |
+          rm -rf /home/user/hack/root-main/backend
+          git clone -b main https://github.com/AlexGeniusMan/RT-Hack-2021-RealityX-Backend.git /home/user/hack/root-main/backend
+          cd /home/user/hack/root-main
+          TAG=latest docker-compose -f docker-compose.production.yml build backend
+          docker service update --image rt_backend:latest main-rt_backend --force
