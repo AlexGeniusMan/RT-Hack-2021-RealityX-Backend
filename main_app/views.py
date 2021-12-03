@@ -88,6 +88,7 @@ class UpdateDogCamerasView(APIView):
 
         response = requests.post(f'{ML_ADDRESS}dogs/', timeout=10000,
                                  json=data).json()
+        print(response)
         for el in response:
             camera_uid = el['url'].split('/')[-2]
             camera = DogCamera.objects.get(uid=camera_uid)
