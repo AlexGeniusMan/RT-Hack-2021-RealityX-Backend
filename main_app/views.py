@@ -57,8 +57,13 @@ class UpdateDogCamerasView(APIView):
 
         cameras = DogCamera.objects.all()
         for camera in cameras:
+            probability_of_dogs = random.randrange(1, 11)
+            if probability_of_dogs < 3:
+                source = 'dogs_clear'
+            else:
+                source = 'dogs'
             images = []
-            for key in s3.list_objects(Bucket='reality-x', Prefix=f'dogs/{camera.uid}')['Contents']:
+            for key in s3.list_objects(Bucket='reality-x', Prefix=f'{source}/{camera.uid}')['Contents']:
                 if not key['Key'].lower().endswith('/'):
                     images.append(f'https://s3.yandexcloud.net/reality-x/{key["Key"]}')
             while True:
@@ -90,6 +95,14 @@ class UpdateDogCamerasView(APIView):
 
         cameras = DogCamera.objects.all()
         cameras = AllDogCamerasSerializer(cameras, context={'request': request}, many=True).data
+
+        for camera in cameras:
+            camera_events = DogCameraEvent.objects.filter(camera__uid=camera['uid']).order_by('-id')[0:30]
+            number_of_dogs = 0
+            for event in camera_events:
+                number_of_dogs += event.dog_number
+            camera['number_of_dogs'] = number_of_dogs
+
         return Response({
             'status': status.HTTP_200_OK,
             'data': {
@@ -334,7 +347,6 @@ class FillDatabaseView(APIView):
                 for i in range(24):
                     containers_number = random.randrange(1, 10)
                     filled_containers_number = random.randrange(0, containers_number)
-                    print(containers_number, filled_containers_number)
                     camera_event = CameraEvent(
                         containers_number=containers_number,
                         filled_containers_number=filled_containers_number,
@@ -429,8 +441,13 @@ class FillDatabaseView(APIView):
             )
             cameras = DogCamera.objects.all()
             for camera in cameras:
+                probability_of_dogs = random.randrange(1, 11)
+                if probability_of_dogs < 3:
+                    source = 'dogs_clear'
+                else:
+                    source = 'dogs'
                 images = []
-                for key in s3.list_objects(Bucket='reality-x', Prefix=f'dogs/{camera.uid}')['Contents']:
+                for key in s3.list_objects(Bucket='reality-x', Prefix=f'{source}/{camera.uid}')['Contents']:
                     if not key['Key'].lower().endswith('/'):
                         images.append(f'https://s3.yandexcloud.net/reality-x/{key["Key"]}')
                 while True:
@@ -438,7 +455,6 @@ class FillDatabaseView(APIView):
                     if not camera.last_img == new_last_img_name:
                         camera.last_img = new_last_img_name
                         break
-                # camera.is_filled = random.randrange(2)
                 camera.save()
 
             update_time = DogUpdatedTime.objects.all().first()
@@ -456,7 +472,7 @@ class FillDatabaseView(APIView):
             for camera in cameras:
                 for i in range(24):
                     dog_number = random.randrange(0, 10)
-                    print(dog_number)
+
                     camera_event = DogCameraEvent(
                         dog_number=dog_number,
                         camera=camera
