@@ -41,6 +41,15 @@ urlpatterns = [
     # Update and get cameras data
     path('api/trash/update_cameras', views.UpdateCamerasView.as_view()),
 
+    # Return all cameras data
+    path('api/dogs/get_all_cameras', views.GetAllDogCamerasView.as_view()),
+
+    # Return camera data
+    path('api/dogs/get_camera/<int:camera_uid>', views.GetDogCameraView.as_view()),
+
+    # Update and get cameras data
+    path('api/dogs/update_cameras', views.UpdateDogCamerasView.as_view()),
+
     # Fill database with test data
     path('api/fill_db', views.FillDatabaseView.as_view()),
 ]
