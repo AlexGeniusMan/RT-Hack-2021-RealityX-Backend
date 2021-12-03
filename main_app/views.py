@@ -23,6 +23,14 @@ class GetAllDogCamerasView(APIView):
     def get(request):
         cameras = DogCamera.objects.all()
         cameras = AllDogCamerasSerializer(cameras, context={'request': request}, many=True).data
+
+        for camera in cameras:
+            camera_events = DogCameraEvent.objects.filter(camera__uid=camera['uid']).order_by('-id')[0:30]
+            number_of_dogs = 0
+            for event in camera_events:
+                number_of_dogs += event.dog_number
+            camera['number_of_dogs'] = number_of_dogs
+
         return Response({
             'status': status.HTTP_200_OK,
             'data': {
