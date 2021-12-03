@@ -60,12 +60,6 @@ urlpatterns += [
 
     # Fill database with test data
     path('api/set_coordinates', views.SetCoordinates.as_view()),
-
-    # Fill database with test data
-    # path('api/set_raw_images', views.SetRawImages.as_view()),
-
-    # Fill database with test data
-    # path('api/fill_db', views.FillDatabaseView.as_view()),
 ]
 
 # Static and media
