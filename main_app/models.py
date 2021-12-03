@@ -51,6 +51,7 @@ class Camera(models.Model):
     error_status = models.BooleanField('Ошибка', default=False)
     is_filled = models.BooleanField('Заполнен', default=False)
     last_img = models.CharField('Последний кадр', max_length=500, blank=True)
+    last_img_pred = models.CharField('Распознанный кадр', max_length=500, blank=True)
 
     class Meta:
         verbose_name = 'Мусор - Камера'

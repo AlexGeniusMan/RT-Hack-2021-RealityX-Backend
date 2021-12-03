@@ -364,39 +364,39 @@ class FillDatabaseView(APIView):
         except Exception as e:
             list_of_errors.append(f"Cameras filling: {str(e)}")
 
-        try:
-            if CameraEvent.objects.all().exists():
-                camera_events = CameraEvent.objects.all()
-                camera_events.delete()
-
-            for i in range(3):
-                print(f'Iteration #{i + 1} started')
-                cameras = Camera.objects.all()
-
-                data = {
-                    "img_size": 1080,
-                    "conf": 0.483,
-                    "urls": [
-                        camera.last_img for camera in cameras
-                    ]
-                }
-
-                response = requests.post('https://577b-193-41-142-48.ngrok.io/predict/trash/', timeout=10000,
-                                         json=data).json()
-                for el in response:
-                    camera_uid = el['url'].split('/')[-2]
-                    camera = Camera.objects.get(uid=camera_uid)
-                    camera.last_img_pred = el['url']
-                    camera.save()
-
-                    camera_event = CameraEvent(
-                        dog_number=el['n_all'],
-                        camera=camera
-                    )
-                    camera_event.save()
-
-        except Exception as e:
-            list_of_errors.append(f"CameraEvent adding: {str(e)}")
+        # try:
+        #     if CameraEvent.objects.all().exists():
+        #         camera_events = CameraEvent.objects.all()
+        #         camera_events.delete()
+        #
+        #     for i in range(3):
+        #         print(f'Iteration #{i + 1} started')
+        #         cameras = Camera.objects.all()
+        #
+        #         data = {
+        #             "img_size": 1080,
+        #             "conf": 0.483,
+        #             "urls": [
+        #                 camera.last_img for camera in cameras
+        #             ]
+        #         }
+        #
+        #         response = requests.post('https://577b-193-41-142-48.ngrok.io/predict/trash/', timeout=10000,
+        #                                  json=data).json()
+        #         for el in response:
+        #             camera_uid = el['url'].split('/')[-2]
+        #             camera = Camera.objects.get(uid=camera_uid)
+        #             camera.last_img_pred = el['url']
+        #             camera.save()
+        #
+        #             camera_event = CameraEvent(
+        #                 dog_number=el['n_all'],
+        #                 camera=camera
+        #             )
+        #             camera_event.save()
+        #
+        # except Exception as e:
+        #     list_of_errors.append(f"CameraEvent adding: {str(e)}")
 
         try:
             if DogUpdatedTime.objects.all().exists():
