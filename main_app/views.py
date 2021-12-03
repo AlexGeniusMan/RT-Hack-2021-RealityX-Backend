@@ -338,10 +338,6 @@ class CreateCameras(APIView):
                 'address': "Альметьевск; Гафиатуллина 47 (1): ТКО"
             },
             {
-                'uid': 7,
-                'address': "Альметьевск; Гафиатуллина 47 (2); ТКО"
-            },
-            {
                 'uid': 10,
                 'address': "Альметьевск; Ленина 66; ТКО"
             },
@@ -368,61 +364,10 @@ class CreateCameras(APIView):
                 address=el['address']
             )
             camera.save()
-            # camera.get_coordinates()
 
         if DogCamera.objects.all().exists():
             cameras = DogCamera.objects.all()
             cameras.delete()
-        test_cameras = [
-            {
-                'uid': 0,
-                'address': "Альметьевск; Белоглазова 131; ТКО"
-            },
-            {
-                'uid': 1,
-                'address': "Альметьевск; Белоглазова 151; ТКО"
-            },
-            {
-                'uid': 3,
-                'address': "Альметьевск; Гафиатуллина 29Б; ТКО"
-            },
-            {
-                'uid': 4,
-                'address': "Альметьевск; Гафиатуллина 39; ТКО"
-            },
-            {
-                'uid': 5,
-                'address': "Альметьевск; Гафиатуллина 45; ТКО"
-            },
-            {
-                'uid': 6,
-                'address': "Альметьевск; Гафиатуллина 47 (1): ТКО"
-            },
-            {
-                'uid': 7,
-                'address': "Альметьевск; Гафиатуллина 47 (2); ТКО"
-            },
-            {
-                'uid': 10,
-                'address': "Альметьевск; Ленина 66; ТКО"
-            },
-            {
-                'uid': 11,
-                'address': "Альметьевск; Ленина 90; ТКО"
-            },
-            {
-                'uid': 12,
-                'address': "Альметьевск; Шевченко 80; ТКО"
-            },
-            {
-                'uid': 14,
-                'address': "Альметьевск; Строителей 20Б; ТКО"
-            },
-            {
-                'uid': 15,
-                'address': "Альметьевск; Строителей 20; ТКО"
-            },
-        ]
         for el in test_cameras:
             camera = DogCamera(
                 uid=el['uid'],
