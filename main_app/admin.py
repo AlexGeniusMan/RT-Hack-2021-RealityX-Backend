@@ -11,8 +11,10 @@ class DogCameraAdmin(admin.ModelAdmin):
 class DogCameraEventAdmin(admin.ModelAdmin):
     list_display = ('camera', 'dog_number')
 
+
 class CameraAdmin(admin.ModelAdmin):
-    list_display = ('address', 'uid', 'x_coordinate', 'y_coordinate', 'error_status', 'is_filled', 'id', 'last_img')
+    list_display = (
+    'address', 'uid', 'x_coordinate', 'y_coordinate', 'error_status', 'is_filled', 'id', 'last_img', 'last_img_pred')
 
 
 admin.site.register(UpdatedTime)

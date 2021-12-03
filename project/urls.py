@@ -49,9 +49,23 @@ urlpatterns = [
 
     # Update and get cameras data
     path('api/dogs/update_cameras', views.UpdateDogCamerasView.as_view()),
+]
+
+urlpatterns += [
+    # Fill database with test data
+    path('api/create_updated_time', views.CreateUpdatedTime.as_view()),
 
     # Fill database with test data
-    path('api/fill_db', views.FillDatabaseView.as_view()),
+    path('api/create_cameras', views.CreateCameras.as_view()),
+
+    # Fill database with test data
+    path('api/set_coordinates', views.SetCoordinates.as_view()),
+
+    # Fill database with test data
+    # path('api/set_raw_images', views.SetRawImages.as_view()),
+
+    # Fill database with test data
+    # path('api/fill_db', views.FillDatabaseView.as_view()),
 ]
 
 # Static and media

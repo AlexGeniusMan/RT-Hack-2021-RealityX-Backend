@@ -16,7 +16,7 @@ class CurrentCamerasSerializer(serializers.ModelSerializer):
     class Meta:
         depth = 0
         model = Camera
-        fields = ('uid', 'address', 'is_filled', 'last_img')
+        fields = ('uid', 'address', 'is_filled', 'last_img', 'last_img_pred')
 
 
 class AllCamerasSerializer(serializers.ModelSerializer):

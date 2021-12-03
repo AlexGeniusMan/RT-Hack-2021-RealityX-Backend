@@ -142,6 +142,7 @@ class DogCamera(models.Model):
             }
 
             r = requests.get(url=url, params=params)
+            print(r)
 
             coordinates = r.json()['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point'][
                 'pos'].split(' ')
