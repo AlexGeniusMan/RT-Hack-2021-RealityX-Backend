@@ -43,6 +43,9 @@ urlpatterns = [
 
     # Fill database with test data
     path('api/fill_db', views.FillDatabaseView.as_view()),
+
+    # Lol
+    path('api/lol', views.Lol.as_view()),
 ]
 
 # Static and media
