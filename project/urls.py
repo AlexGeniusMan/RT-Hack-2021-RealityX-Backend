@@ -33,16 +33,33 @@ urlpatterns = [
     url(r'^api/auth/', include('djoser.urls.jwt')),
 
     # Return all cameras data
-    path('api/get_all_cameras', views.GetAllCamerasView.as_view()),
+    path('api/trash/get_all_cameras', views.GetAllCamerasView.as_view()),
 
     # Return camera data
-    path('api/get_camera/<int:camera_uid>', views.GetCameraView.as_view()),
+    path('api/trash/get_camera/<int:camera_uid>', views.GetCameraView.as_view()),
 
     # Update and get cameras data
-    path('api/update_cameras', views.UpdateCamerasView.as_view()),
+    path('api/trash/update_cameras', views.UpdateCamerasView.as_view()),
+
+    # Return all cameras data
+    path('api/dogs/get_all_cameras', views.GetAllDogCamerasView.as_view()),
+
+    # Return camera data
+    path('api/dogs/get_camera/<int:camera_uid>', views.GetDogCameraView.as_view()),
+
+    # Update and get cameras data
+    path('api/dogs/update_cameras', views.UpdateDogCamerasView.as_view()),
+]
+
+urlpatterns += [
+    # Fill database with test data
+    path('api/create_updated_time', views.CreateUpdatedTime.as_view()),
 
     # Fill database with test data
-    path('api/fill_db', views.FillDatabaseView.as_view()),
+    path('api/create_cameras', views.CreateCameras.as_view()),
+
+    # Fill database with test data
+    path('api/set_coordinates', views.SetCoordinates.as_view()),
 ]
 
 # Static and media
