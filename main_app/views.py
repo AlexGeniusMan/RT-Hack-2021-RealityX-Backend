@@ -93,16 +93,6 @@ class GetCameraView(APIView):
         })
 
 
-class Lol(APIView):
-    """
-    Lol
-    """
-
-    @staticmethod
-    def get(request):
-        return Response('lol')
-
-
 class FillDatabaseView(APIView):
     """
     Fill database with test data
