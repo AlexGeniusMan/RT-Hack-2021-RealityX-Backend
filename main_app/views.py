@@ -41,6 +41,15 @@ class UpdateCamerasView(APIView):
                     camera.last_img = new_last_img_name
                     break
             camera.is_filled = random.randrange(2)
+            containers_number = random.randrange(1, 10)
+            filled_containers_number = random.randrange(0, containers_number)
+            print(containers_number, filled_containers_number)
+            camera_event = CameraEvent(
+                containers_number=containers_number,
+                filled_containers_number=filled_containers_number,
+                camera=camera
+            )
+            camera_event.save()
             camera.save()
 
         update_time = UpdatedTime.objects.all().first()
@@ -83,12 +92,16 @@ class GetCameraView(APIView):
     @staticmethod
     def get(request, camera_uid):
         camera = Camera.objects.get(uid=camera_uid)
+        events = CameraEvent.objects.filter(camera=camera).order_by('-id')[0:30]
+
         camera = CurrentCamerasSerializer(camera, context={'request': request}).data
+        events = CameraEventSerializer(events, context={'request': request}, many=True).data
         camera['timestamp'] = UpdatedTime.objects.all().first().value
         return Response({
             'status': status.HTTP_200_OK,
             'data': {
-                'camera': camera
+                'camera': camera,
+                'events': events
             }
         })
 
@@ -203,6 +216,28 @@ class FillDatabaseView(APIView):
 
         except Exception as e:
             list_of_errors.append(f"UpdatedTime adding: {str(e)}")
+
+        try:
+            if CameraEvent.objects.all().exists():
+                camera_events = CameraEvent.objects.all()
+                camera_events.delete()
+
+            cameras = Camera.objects.all()
+            for camera in cameras:
+                for i in range(24):
+                    containers_number = random.randrange(1, 10)
+                    filled_containers_number = random.randrange(0, containers_number)
+                    print(containers_number, filled_containers_number)
+                    camera_event = CameraEvent(
+                        containers_number=containers_number,
+                        filled_containers_number=filled_containers_number,
+                        camera=camera
+                    )
+                    camera_event.save()
+
+        except Exception as e:
+            list_of_errors.append(f"CameraEvent adding: {str(e)}")
+            raise
 
         return Response({
             'status': status.HTTP_200_OK,

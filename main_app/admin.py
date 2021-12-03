@@ -10,3 +10,4 @@ class CameraAdmin(admin.ModelAdmin):
 
 admin.site.register(UpdatedTime)
 admin.site.register(Camera, CameraAdmin)
+admin.site.register(CameraEvent)

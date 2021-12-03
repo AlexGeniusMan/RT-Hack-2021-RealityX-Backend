@@ -29,6 +29,20 @@ class UpdatedTime(models.Model):
         super().save(*args, **kwargs)
 
 
+class CameraEvent(models.Model):
+    containers_number = models.IntegerField('Количество контейнеров', blank=True, null=True)
+    filled_containers_number = models.IntegerField('Количество заполненных контейнеров', blank=True, null=True)
+    camera = models.ForeignKey('Camera', on_delete=models.CASCADE, verbose_name='Камера',
+                               related_name='events')
+
+    class Meta:
+        verbose_name = 'Событие с контейнерами'
+        verbose_name_plural = 'События с контейнерами'
+
+    def __str__(self):
+        return f'Событие с контейнерами ({self.filled_containers_number}/{self.containers_number})'
+
+
 class Camera(models.Model):
     uid = models.IntegerField('ID камеры', blank=True, null=True)
     address = models.CharField('Адрес', max_length=500)
@@ -43,7 +57,7 @@ class Camera(models.Model):
         verbose_name_plural = 'Камеры'
 
     def __str__(self):
-        return self.address
+        return str(self.uid) + ' ' + self.address
 
     def get_coordinates(self, *args, **kwargs):
         try:

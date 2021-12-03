@@ -3,7 +3,15 @@ from rest_framework import serializers
 from .models import *
 
 
+class CameraEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        depth = 0
+        model = CameraEvent
+        fields = ('id', 'containers_number', 'filled_containers_number')
+
+
 class CurrentCamerasSerializer(serializers.ModelSerializer):
+    # events = CameraEventAdmin(read_only=True, many=True)
 
     class Meta:
         depth = 0
@@ -12,7 +20,6 @@ class CurrentCamerasSerializer(serializers.ModelSerializer):
 
 
 class AllCamerasSerializer(serializers.ModelSerializer):
-
     class Meta:
         depth = 0
         model = Camera
