@@ -22,6 +22,9 @@ class GetAllDogCamerasView(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         cameras = DogCamera.objects.all()
         cameras = AllDogCamerasSerializer(cameras, context={'request': request}, many=True).data
 
@@ -45,6 +48,9 @@ class UpdateDogCamerasView(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         session = boto3.session.Session()
 
         s3 = session.client(
@@ -124,6 +130,9 @@ class GetDogCameraView(APIView):
 
     @staticmethod
     def get(request, camera_uid):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         camera = DogCamera.objects.get(uid=camera_uid)
         events = DogCameraEvent.objects.filter(camera=camera).order_by('-id')[0:30]
 
@@ -146,6 +155,9 @@ class GetAllCamerasView(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         cameras = Camera.objects.all()
         cameras = AllCamerasSerializer(cameras, context={'request': request}, many=True).data
         return Response({
@@ -164,6 +176,9 @@ class UpdateCamerasView(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         session = boto3.session.Session()
 
         s3 = session.client(
@@ -232,6 +247,9 @@ class GetCameraView(APIView):
 
     @staticmethod
     def get(request, camera_uid):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         camera = Camera.objects.get(uid=camera_uid)
         events = CameraEvent.objects.filter(camera=camera).order_by('-id')[0:30]
 
@@ -254,6 +272,9 @@ class CreateUpdatedTime(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         if UpdatedTime.objects.all().exists():
             update_times = UpdatedTime.objects.all()
             update_times.delete()
@@ -276,6 +297,9 @@ class CreateCameras(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         if Camera.objects.all().exists():
             cameras = Camera.objects.all()
             cameras.delete()
@@ -352,6 +376,9 @@ class SetCoordinates(APIView):
 
     @staticmethod
     def get(request):
+        if not request.user.is_authenticated:
+            return Response({'status': status.HTTP_403_FORBIDDEN, 'message': 'Forbidden'})
+
         cameras = Camera.objects.all()
         for camera in cameras:
             camera.get_coordinates()
